@@ -14,3 +14,4 @@ export default function withFilters( hookName ) {
 		return applyFilters( hookName, OriginalComponent );
 	};
 }
+
