@@ -1,7 +1,22 @@
 /**
+ * External dependencies
+ */
+import { includes } from 'lodash';
+
+/**
  * Browser dependencies
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
+
+/**
+ * An array of tag groups used by isInlineForTag function.
+ * If tagName and nodeName are present in the same group, the node should be treated as inline.
+ * @type {Array}
+ */
+const inlineWhitelistTagGroups = [
+	[ 'ul', 'li', 'ol' ],
+	[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+];
 
 const inlineWhitelist = {
 	strong: {},
@@ -63,8 +78,18 @@ export function isAttributeWhitelisted( tag, attribute ) {
 	);
 }
 
-export function isInline( node, additionalInlineWhitelist = [] ) {
-	return !! inlineWhitelist[ node.nodeName.toLowerCase() ] || additionalInlineWhitelist.indexOf( node.nodeName.toLowerCase() ) !== -1;
+function isInlineForTag( nodeName, tagName ) {
+	if ( ! tagName || ! nodeName ) {
+		return false;
+	}
+	return inlineWhitelistTagGroups.some( tagGroup =>
+		includes( tagGroup, nodeName ) && includes( tagGroup, tagName )
+	);
+}
+
+export function isInline( node, tagName ) {
+	const nodaName = node.nodeName.toLowerCase();
+	return !! inlineWhitelist[ nodaName ] || isInlineForTag( nodaName, tagName );
 }
 
 export function isInlineWrapper( node ) {
