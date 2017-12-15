@@ -2,12 +2,11 @@
 * External Dependencies
 */
 import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
 
 /**
  * WordPress depensdencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, withAPIData, Placeholder, Spinner } from '@wordpress/components';
 
@@ -97,17 +96,13 @@ class AuthorBlock extends Component {
 	}
 }
 
-const applyWithAPIData = withAPIData( ( props ) => ( {
-	author: `/wp/v2/users/${ props.postAuthorId }`,
-} ) );
-
-const applyConnect = connect(
-	( state ) => ( {
-		postAuthorId: getCurrentPostAuthor( state ),
-	} )
-);
-
-export default flowRight( [
-	applyConnect,
-	applyWithAPIData,
-] )( AuthorBlock );
+export default compose(
+	connect(
+		( state ) => ( {
+			postAuthorId: getCurrentPostAuthor( state ),
+		} )
+	),
+	withAPIData( ( props ) => ( {
+		author: `/wp/v2/users/${ props.postAuthorId }`,
+	} ) )
+)( AuthorBlock );
