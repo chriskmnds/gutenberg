@@ -108,15 +108,28 @@ class BlockList extends Component {
 	}
 
 	onCopy( event ) {
-		const { multiSelectedBlocks } = this.props;
+		const { multiSelectedBlocks, selectedBlock } = this.props;
 
-		if ( multiSelectedBlocks.length ) {
-			const serialized = serialize( multiSelectedBlocks );
-
-			event.clipboardData.setData( 'text/plain', serialized );
-			event.clipboardData.setData( 'text/html', serialized );
-			event.preventDefault();
+		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
+			return;
 		}
+
+		if ( selectedBlock ) {
+			const activeElement = document.activeElement;
+			const nodeName = activeElement.nodeName;
+			const isContentEditable = activeElement.contentEditable === 'true';
+
+			if ( nodeName === 'input' || nodeName === 'textarea' || isContentEditable ) {
+				return;
+			}
+		}
+
+		const serialized = serialize( selectedBlock || multiSelectedBlocks );
+
+		event.clipboardData.setData( 'text/plain', serialized );
+		event.clipboardData.setData( 'text/html', serialized );
+
+		event.preventDefault();
 	}
 
 	onCut( event ) {
