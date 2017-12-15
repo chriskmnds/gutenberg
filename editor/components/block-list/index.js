@@ -37,6 +37,15 @@ import {
 } from '../../selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../actions';
 
+function isAnyInputFieldActive() {
+	const { nodeName, contentEditable } = document.activeElement;
+	return (
+		nodeName === 'input' ||
+		nodeName === 'textarea' ||
+		contentEditable === 'true'
+	);
+}
+
 class BlockList extends Component {
 	constructor( props ) {
 		super( props );
@@ -114,21 +123,14 @@ class BlockList extends Component {
 			return;
 		}
 
-		if ( selectedBlock ) {
-			const activeElement = document.activeElement;
-			const nodeName = activeElement.nodeName;
-			const isContentEditable = activeElement.contentEditable === 'true';
-
-			if ( nodeName === 'input' || nodeName === 'textarea' || isContentEditable ) {
-				return;
-			}
+		if ( selectedBlock && isAnyInputFieldActive() ) {
+			return;
 		}
 
 		const serialized = serialize( selectedBlock || multiSelectedBlocks );
 
 		event.clipboardData.setData( 'text/plain', serialized );
 		event.clipboardData.setData( 'text/html', serialized );
-
 		event.preventDefault();
 	}
 
