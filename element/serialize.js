@@ -183,6 +183,11 @@ function renderElement( element ) {
 	}
 
 	if ( Array.isArray( element ) ) {
+		if ( element[ 1 ] && element[ 1 ].constructor === Object ) {
+			const [ type, props, children ] = element;
+			return renderElement( { type, props: { ...props, children } } );
+		}
+
 		return element.map( renderElement ).join( '' );
 	}
 
@@ -271,7 +276,11 @@ function renderChildren( children ) {
 		if ( typeof child === 'string' ) {
 			str += child;
 		} else if ( Array.isArray( child ) ) {
-			str += renderChildren( child );
+			if ( child[ 1 ] && child[ 1 ].constructor === Object ) {
+				str += renderElement( child );
+			} else {
+				str += renderChildren( child );
+			}
 		} else if ( typeof child === 'object' && child ) {
 			str += renderElement( child );
 		} else if ( typeof child === 'number' ) {
